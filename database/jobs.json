@@ -1,0 +1,34 @@
+[
+    {
+        "titulo": "Customer Support Agent",
+        "empresa": "Empresa A",
+        "habilidades": [
+            "servicio al cliente",
+            "comunicación",
+            "inglés"
+        ],
+        "idioma": "inglés"
+    },
+
+    {
+        "titulo": "Recepcionista Bilingüe",
+        "empresa": "Empresa B",
+        "habilidades": [
+            "servicio al cliente",
+            "comunicación",
+            "office"
+        ],
+        "idioma": "inglés"
+    },
+
+    {
+        "titulo": "Asistente Administrativo",
+        "empresa": "Empresa C",
+        "habilidades": [
+            "office",
+            "excel",
+            "organización"
+        ],
+        "idioma": ""
+    }
+]

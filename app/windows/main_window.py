@@ -5,130 +5,262 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QPushButton,
     QLabel,
-    QFrame
+    QFrame,
+    QStackedWidget
 )
 
-from PySide6.QtCore import Qt
+from app.pages.home_page import HomePage
+from app.pages.cv_page import CVPage
+from app.pages.search_page import SearchPage
+from app.pages.reports_page import ReportsPage
+
 
 
 class MainWindow(QMainWindow):
 
-    def __init__(self):
+
+    def __init__(self, servicio):
+
         super().__init__()
 
-        self.setWindowTitle("JobHunter AI")
-        self.resize(1200, 750)
+
+        self.servicio = servicio
+
+
+        self.setWindowTitle(
+            "JobHunter AI"
+        )
+
+
+        self.resize(
+            1200,
+            750
+        )
+
 
         self.crear_interfaz()
 
 
+
+
     def crear_interfaz(self):
 
+
         principal = QWidget()
-        self.setCentralWidget(principal)
-
-        layout_principal = QHBoxLayout(principal)
 
 
-        # -----------------
-        # Barra lateral
-        # -----------------
+        self.setCentralWidget(
+            principal
+        )
+
+
+        layout_principal = QHBoxLayout(
+            principal
+        )
+
+
+
+        # ==========================
+        # SIDEBAR
+        # ==========================
+
 
         sidebar = QFrame()
-        sidebar.setObjectName("sidebar")
-        sidebar.setFixedWidth(250)
-
-        layout_sidebar = QVBoxLayout(sidebar)
 
 
-        titulo = QLabel("JobHunter AI")
-        titulo.setObjectName("title")
-
-        layout_sidebar.addWidget(titulo)
-
-
-        botones = [
-            "🏠 Inicio",
-            "📄 Mi CV",
-            "🔍 Buscar empleos",
-            "📊 Reportes",
-            "⚙ Configuración"
-        ]
+        sidebar.setObjectName(
+            "sidebar"
+        )
 
 
-        for texto in botones:
+        sidebar.setFixedWidth(
+            250
+        )
 
-            boton = QPushButton(texto)
 
-            layout_sidebar.addWidget(boton)
+        layout_sidebar = QVBoxLayout(
+            sidebar
+        )
+
+
+
+        titulo = QLabel(
+            "JobHunter AI"
+        )
+
+
+        titulo.setObjectName(
+            "title"
+        )
+
+
+        layout_sidebar.addWidget(
+            titulo
+        )
+
+
+
+        self.btn_inicio = QPushButton(
+            "🏠 Inicio"
+        )
+
+
+        self.btn_cv = QPushButton(
+            "📄 Mi CV"
+        )
+
+
+        self.btn_buscar = QPushButton(
+            "🔍 Buscar empleos"
+        )
+
+
+        self.btn_reportes = QPushButton(
+            "📊 Reportes"
+        )
+
+
+
+        layout_sidebar.addWidget(
+            self.btn_inicio
+        )
+
+
+        layout_sidebar.addWidget(
+            self.btn_cv
+        )
+
+
+        layout_sidebar.addWidget(
+            self.btn_buscar
+        )
+
+
+        layout_sidebar.addWidget(
+            self.btn_reportes
+        )
+
 
 
         layout_sidebar.addStretch()
 
 
-        # -----------------
-        # Contenido
-        # -----------------
-
-        contenido = QWidget()
-
-        layout_contenido = QVBoxLayout(contenido)
 
 
-        bienvenida = QLabel(
-            "Bienvenido a JobHunter AI"
-        )
-
-        bienvenida.setAlignment(
-            Qt.AlignCenter
-        )
-
-        bienvenida.setObjectName("title")
+        # ==========================
+        # PAGINAS
+        # ==========================
 
 
-        descripcion = QLabel(
-            "Tu asistente inteligente para encontrar empleo"
-        )
+        self.paginas = QStackedWidget()
 
-        descripcion.setAlignment(
-            Qt.AlignCenter
+
+
+        self.home_page = HomePage()
+
+
+
+        self.cv_page = CVPage(
+            self.servicio
         )
 
 
-        boton_cv = QPushButton(
-            "📄 Cargar CV"
-        )
 
-        boton_buscar = QPushButton(
-            "🔍 Buscar ofertas"
+        self.search_page = SearchPage(
+            self.servicio
         )
 
 
-        layout_contenido.addStretch()
 
-        layout_contenido.addWidget(
-            bienvenida
+        self.reports_page = ReportsPage()
+
+
+
+
+        self.paginas.addWidget(
+            self.home_page
         )
 
-        layout_contenido.addWidget(
-            descripcion
+
+        self.paginas.addWidget(
+            self.cv_page
         )
 
-        layout_contenido.addWidget(
-            boton_cv
+
+        self.paginas.addWidget(
+            self.search_page
         )
 
-        layout_contenido.addWidget(
-            boton_buscar
+
+        self.paginas.addWidget(
+            self.reports_page
         )
 
-        layout_contenido.addStretch()
+
+
+
+
+        # ==========================
+        # NAVEGACION
+        # ==========================
+
+
+        self.btn_inicio.clicked.connect(
+
+            lambda:
+            self.paginas.setCurrentWidget(
+                self.home_page
+            )
+
+        )
+
+
+
+        self.btn_cv.clicked.connect(
+
+            lambda:
+            self.paginas.setCurrentWidget(
+                self.cv_page
+            )
+
+        )
+
+
+
+        self.btn_buscar.clicked.connect(
+
+            lambda:
+            self.paginas.setCurrentWidget(
+                self.search_page
+            )
+
+        )
+
+
+
+        self.btn_reportes.clicked.connect(
+
+            lambda:
+            self.paginas.setCurrentWidget(
+                self.reports_page
+            )
+
+        )
+
+
+
+
+
+        # ==========================
+        # ARMAR VENTANA
+        # ==========================
 
 
         layout_principal.addWidget(
             sidebar
         )
 
+
         layout_principal.addWidget(
-            contenido
+            self.paginas
         )
