@@ -1,6 +1,6 @@
 from services.cv_service import CVService
 from engine.search_engine import SearchEngine
-from services.pdf_service import PDFService
+from backend.reports.pdf_generator import PDFService
 
 
 
