@@ -15,7 +15,7 @@ class JSearchSource:
 
         print()
         print("========================================")
-        print("JSEARCH SOURCE INICIALIZADA")
+        print("🔥 JSEARCH SOURCE INICIALIZADA")
         print("========================================")
 
         print(
@@ -69,49 +69,48 @@ class JSearchSource:
         if not self.api_key:
 
             print()
-            print("❌ ERROR: JSEARCH_API_KEY ESTÁ VACÍA")
+            print("❌ ERROR: API KEY VACÍA")
 
             return []
 
 
         # =====================================================
-        # NORMALIZAR PAÍS
+        # HEADERS
         # =====================================================
 
-        pais_codigo = self.convertir_pais(
-            pais
-        )
+        headers = {
 
+            "x-rapidapi-key":
+                self.api_key,
 
-        print(
-            "Código país:",
-            pais_codigo if pais_codigo else "TODOS"
-        )
+            "x-rapidapi-host":
+                "jsearch.p.rapidapi.com",
+
+            "Content-Type":
+                "application/json"
+        }
 
 
         # =====================================================
-        # NORMALIZAR CONSULTA
+        # CONSULTA
         # =====================================================
 
         consulta_final = (
-            str(consulta or "").strip()
+            str(consulta or "")
+            .strip()
         )
 
 
         if not consulta_final:
 
-            consulta_final = "software developer"
+            consulta_final = (
+                "software developer"
+            )
 
 
         # =====================================================
-        # IMPORTANTE
+        # PARÁMETROS
         # =====================================================
-        #
-        # NO agregamos "remote" a la consulta.
-        #
-        # El filtro remoto se manda mediante
-        # remote_jobs_only.
-        #
 
         params = {
 
@@ -133,6 +132,13 @@ class JSearchSource:
         # PAÍS
         # =====================================================
 
+        pais_codigo = (
+            self.convertir_pais(
+                pais
+            )
+        )
+
+
         if pais_codigo:
 
             params["country"] = (
@@ -150,30 +156,6 @@ class JSearchSource:
                 "remote_jobs_only"
             ] = "true"
 
-
-        # =====================================================
-        # HEADERS
-        # =====================================================
-
-        headers = {
-
-            "x-rapidapi-host":
-                "jsearch.p.rapidapi.com",
-
-            "x-rapidapi-key":
-                self.api_key,
-
-            "Content-Type":
-                "application/json",
-
-            "Accept":
-                "application/json"
-        }
-
-
-        # =====================================================
-        # MOSTRAR REQUEST
-        # =====================================================
 
         print()
         print("========================================")
@@ -209,10 +191,11 @@ class JSearchSource:
 
             )
 
+
         except requests.exceptions.Timeout:
 
             print()
-            print("❌ ERROR: TIMEOUT DE JSEARCH")
+            print("❌ REQUEST TIMEOUT")
 
             return []
 
@@ -220,7 +203,8 @@ class JSearchSource:
         except requests.exceptions.ConnectionError as error:
 
             print()
-            print("❌ ERROR DE CONEXIÓN CON JSEARCH")
+            print("❌ ERROR DE CONEXIÓN")
+
             print(
                 error
             )
@@ -231,7 +215,7 @@ class JSearchSource:
         except requests.exceptions.RequestException as error:
 
             print()
-            print("❌ ERROR REQUEST JSEARCH")
+            print("❌ ERROR REQUEST")
 
             print(
                 error
@@ -243,7 +227,7 @@ class JSearchSource:
         except Exception as error:
 
             print()
-            print("❌ ERROR INESPERADO REQUEST")
+            print("❌ ERROR DESCONOCIDO REQUEST")
 
             print(
                 error
@@ -253,36 +237,51 @@ class JSearchSource:
 
 
         # =====================================================
-        # RESPUESTA REAL
+        # RESPUESTA RAW
         # =====================================================
 
         print()
         print("========================================")
-        print("🔥🔥🔥 RESPUESTA REAL DE JSEARCH 🔥🔥🔥")
+        print("🔥🔥🔥 RESPUESTA DE RAPIDAPI 🔥🔥🔥")
         print("========================================")
 
+
+        print()
+        print("STATUS:")
+
         print(
-            "STATUS:",
             respuesta.status_code
         )
 
+
         print()
+        print("URL FINAL:")
+
         print(
-            "URL FINAL:",
             respuesta.url
         )
 
+
         print()
-        print(
-            "RESPUESTA:"
-        )
+        print("RESPUESTA RAW:")
 
         print(
             respuesta.text[:10000]
         )
 
+
+        # =====================================================
+        # HEADERS RESPUESTA
+        # =====================================================
+
         print()
-        print("========================================")
+        print("HEADERS DE RESPUESTA:")
+
+        print(
+            dict(
+                respuesta.headers
+            )
+        )
 
 
         # =====================================================
@@ -293,7 +292,10 @@ class JSearchSource:
 
             print()
             print("❌ ERROR 401")
-            print("API KEY NO AUTORIZADA")
+
+            print(
+                "API KEY NO AUTORIZADA"
+            )
 
             return []
 
@@ -302,22 +304,10 @@ class JSearchSource:
 
             print()
             print("❌ ERROR 403")
-            print("ACCESO DENEGADO")
 
-            try:
-
-                error_json = (
-                    respuesta.json()
-                )
-
-                print(
-                    "DETALLE:",
-                    error_json
-                )
-
-            except Exception:
-
-                pass
+            print(
+                "ACCESO DENEGADO / API NO SUSCRITA"
+            )
 
             return []
 
@@ -326,7 +316,10 @@ class JSearchSource:
 
             print()
             print("❌ ERROR 404")
-            print("ENDPOINT NO ENCONTRADO")
+
+            print(
+                "ENDPOINT NO ENCONTRADO"
+            )
 
             return []
 
@@ -335,7 +328,10 @@ class JSearchSource:
 
             print()
             print("❌ ERROR 429")
-            print("LÍMITE DE REQUESTS ALCANZADO")
+
+            print(
+                "LÍMITE DE SOLICITUDES ALCANZADO"
+            )
 
             return []
 
@@ -343,9 +339,10 @@ class JSearchSource:
         if respuesta.status_code != 200:
 
             print()
+            print("❌ JSEARCH DEVOLVIÓ ERROR")
+
             print(
-                "❌ ERROR HTTP:",
-                respuesta.status_code
+                respuesta.text[:5000]
             )
 
             return []
@@ -361,40 +358,49 @@ class JSearchSource:
                 respuesta.json()
             )
 
+
         except ValueError:
 
             print()
-            print("❌ ERROR: JSEARCH NO DEVOLVIÓ JSON")
+            print("❌ RESPUESTA JSON INVÁLIDA")
 
             return []
 
 
         # =====================================================
-        # STATUS API
+        # STATUS JSEARCH
         # =====================================================
 
         print()
         print("========================================")
-        print("INFORMACIÓN DE JSEARCH")
+        print("INFORMACIÓN JSEARCH")
         print("========================================")
+
 
         print(
             "Status API:",
             datos.get(
-                "status",
-                "NO ESPECIFICADO"
+                "status"
             )
         )
 
 
-        if "message" in datos:
-
-            print(
-                "Mensaje:",
-                datos.get(
-                    "message"
-                )
+        print(
+            "Mensaje API:",
+            datos.get(
+                "message",
+                ""
             )
+        )
+
+
+        print(
+            "Request ID:",
+            datos.get(
+                "request_id",
+                ""
+            )
+        )
 
 
         # =====================================================
@@ -407,6 +413,11 @@ class JSearchSource:
         )
 
 
+        if trabajos is None:
+
+            trabajos = []
+
+
         if not isinstance(
             trabajos,
             list
@@ -414,7 +425,7 @@ class JSearchSource:
 
             print()
             print(
-                "❌ ERROR: data NO ES UNA LISTA"
+                "❌ DATA NO ES UNA LISTA"
             )
 
             print(
@@ -425,21 +436,27 @@ class JSearchSource:
 
 
         print()
+        print("========================================")
+        print("EMPLEOS RECIBIDOS")
+        print("========================================")
+
+
         print(
-            "EMPLEOS RECIBIDOS:",
+            "Total:",
             len(trabajos)
         )
 
 
         # =====================================================
-        # SI NO HAY EMPLEOS
+        # SI NO HAY RESULTADOS
         # =====================================================
 
         if not trabajos:
 
             print()
-            print("⚠️ JSEARCH RESPONDIÓ CORRECTAMENTE")
-            print("⚠️ PERO NO DEVOLVIÓ EMPLEOS")
+            print(
+                "⚠️ JSEARCH RESPONDIÓ 200 PERO NO DEVOLVIÓ EMPLEOS"
+            )
 
             return []
 
@@ -448,15 +465,9 @@ class JSearchSource:
         # MOSTRAR EMPLEOS CRUDOS
         # =====================================================
 
-        print()
-        print("========================================")
-        print("EMPLEOS RECIBIDOS DE JSEARCH")
-        print("========================================")
-
-
         for posicion, oferta in enumerate(
 
-            trabajos[:10],
+            trabajos,
 
             start=1
 
@@ -517,15 +528,15 @@ class JSearchSource:
 
 
             print(
-                "Ubicación:",
+                "ID:",
                 oferta.get(
-                    "job_location"
+                    "job_id"
                 )
             )
 
 
         # =====================================================
-        # CONVERTIR A JOB
+        # CONVERTIR EMPLEOS
         # =====================================================
 
         empleos = []
@@ -630,7 +641,7 @@ class JSearchSource:
             )
 
 
-            pais_oferta_api = (
+            pais_oferta = (
                 oferta.get(
                     "job_country"
                 )
@@ -650,10 +661,10 @@ class JSearchSource:
             # PAÍS
             # =================================================
 
-            pais_oferta = (
+            pais_detectado = (
                 self.detectar_pais(
 
-                    pais_oferta_api,
+                    pais_oferta,
 
                     ciudad,
 
@@ -694,18 +705,14 @@ class JSearchSource:
                 )
 
 
-            if pais_oferta:
+            if pais_detectado:
 
                 partes.append(
-                    pais_oferta
+                    pais_detectado
                 )
 
 
-            if (
-                not partes
-                and
-                job_location
-            ):
+            if not partes and job_location:
 
                 partes.append(
                     str(
@@ -724,16 +731,13 @@ class JSearchSource:
             # =================================================
 
             remoto_oferta = (
-                oferta.get(
-                    "job_is_remote",
-                    False
-                )
-            )
-
-
-            remoto_oferta = (
                 self.convertir_bool(
-                    remoto_oferta
+
+                    oferta.get(
+                        "job_is_remote",
+                        False
+                    )
+
                 )
             )
 
@@ -801,23 +805,19 @@ class JSearchSource:
             ]
 
 
-            evidencia_remota = any(
+            if any(
 
                 palabra in texto_remoto
 
-                for palabra
-                in indicadores_remoto
+                for palabra in indicadores_remoto
 
-            )
-
-
-            if evidencia_remota:
+            ):
 
                 remoto_oferta = True
 
 
             # =================================================
-            # TIPO DE EMPLEO
+            # TIPO EMPLEO
             # =================================================
 
             tipo_empleo = (
@@ -835,17 +835,13 @@ class JSearchSource:
             salario = ""
 
 
-            salario_minimo = (
-                oferta.get(
-                    "job_min_salary"
-                )
+            salario_minimo = oferta.get(
+                "job_min_salary"
             )
 
 
-            salario_maximo = (
-                oferta.get(
-                    "job_max_salary"
-                )
+            salario_maximo = oferta.get(
+                "job_max_salary"
             )
 
 
@@ -911,16 +907,17 @@ class JSearchSource:
             habilidades = []
 
 
-            habilidades_api = (
-                oferta.get(
-                    "job_required_skills"
-                )
+            habilidades_api = oferta.get(
+                "job_required_skills"
             )
 
 
             if isinstance(
+
                 habilidades_api,
+
                 list
+
             ):
 
                 habilidades = [
@@ -941,16 +938,17 @@ class JSearchSource:
             experiencia = 0
 
 
-            experiencia_api = (
-                oferta.get(
-                    "job_required_experience"
-                )
+            experiencia_api = oferta.get(
+                "job_required_experience"
             )
 
 
             if isinstance(
+
                 experiencia_api,
+
                 dict
+
             ):
 
                 meses = (
@@ -974,8 +972,11 @@ class JSearchSource:
                         )
 
                     except (
+
                         ValueError,
+
                         TypeError
+
                     ):
 
                         experiencia = 0
@@ -1006,46 +1007,60 @@ class JSearchSource:
             # CREAR JOB
             # =================================================
 
-            empleo = Job(
+            try:
 
-                titulo=titulo,
+                empleo = Job(
 
-                empresa=empresa,
+                    titulo=titulo,
 
-                descripcion=descripcion,
+                    empresa=empresa,
 
-                habilidades=habilidades,
+                    descripcion=descripcion,
 
-                experiencia=experiencia,
+                    habilidades=habilidades,
 
-                link=link,
+                    experiencia=experiencia,
 
-                ubicacion=ubicacion,
+                    link=link,
 
-                salario=salario,
+                    ubicacion=ubicacion,
 
-                idioma=idioma,
+                    salario=salario,
 
-                nivel=nivel,
+                    idioma=idioma,
 
-                job_id=job_id,
+                    nivel=nivel,
 
-                remoto=remoto_oferta,
+                    job_id=job_id,
 
-                pais=pais_oferta,
+                    remoto=remoto_oferta,
 
-                tipo_empleo=tipo_empleo
+                    pais=pais_detectado,
 
-            )
+                    tipo_empleo=tipo_empleo
+
+                )
 
 
-            empleos.append(
-                empleo
-            )
+                empleos.append(
+                    empleo
+                )
+
+
+            except Exception as error:
+
+                print()
+                print(
+                    "❌ ERROR CREANDO JOB:"
+                )
+
+                print(
+                    error
+                )
 
 
         # =====================================================
-        # FILTRO LOCAL DE PAÍS
+        # FILTRO LOCAL PAÍS
         # =====================================================
 
         if pais_codigo:
@@ -1056,7 +1071,7 @@ class JSearchSource:
             print("========================================")
 
 
-            empleos_filtrados = []
+            filtrados = []
 
 
             for empleo in empleos:
@@ -1066,15 +1081,21 @@ class JSearchSource:
                     str(
 
                         getattr(
+
                             empleo,
+
                             "pais",
+
                             ""
+
                         )
 
                         or ""
 
                     )
+
                     .strip()
+
                     .upper()
 
                 )
@@ -1082,7 +1103,7 @@ class JSearchSource:
 
                 if pais_empleo == pais_codigo:
 
-                    empleos_filtrados.append(
+                    filtrados.append(
                         empleo
                     )
 
@@ -1105,9 +1126,7 @@ class JSearchSource:
                     )
 
 
-            empleos = (
-                empleos_filtrados
-            )
+            empleos = filtrados
 
 
         # =====================================================
@@ -1122,27 +1141,26 @@ class JSearchSource:
             print("========================================")
 
 
-            empleos_filtrados = []
+            filtrados = []
 
 
             for empleo in empleos:
 
-                es_remoto = (
-                    self.convertir_bool(
+                if self.convertir_bool(
 
-                        getattr(
-                            empleo,
-                            "remoto",
-                            False
-                        )
+                    getattr(
+
+                        empleo,
+
+                        "remoto",
+
+                        False
 
                     )
-                )
 
+                ):
 
-                if es_remoto:
-
-                    empleos_filtrados.append(
+                    filtrados.append(
                         empleo
                     )
 
@@ -1157,9 +1175,7 @@ class JSearchSource:
                     )
 
 
-            empleos = (
-                empleos_filtrados
-            )
+            empleos = filtrados
 
 
         # =====================================================
@@ -1168,7 +1184,7 @@ class JSearchSource:
 
         print()
         print("========================================")
-        print("RESULTADO JSEARCH")
+        print("🔥 RESULTADO JSEARCH")
         print("========================================")
 
 
@@ -1190,21 +1206,15 @@ class JSearchSource:
 
                 empleo.empresa,
 
-                "| País:",
+                "|",
 
                 empleo.pais,
 
-                "| Remoto:",
+                "| remoto:",
 
                 empleo.remoto
 
             )
-
-
-        print()
-        print("========================================")
-        print("JSEARCH FINALIZADO")
-        print("========================================")
 
 
         return empleos
@@ -1372,8 +1382,7 @@ class JSearchSource:
 
             indicador in texto
 
-            for indicador
-            in indicadores_cr
+            for indicador in indicadores_cr
 
         ):
 
@@ -1401,8 +1410,7 @@ class JSearchSource:
 
             indicador in texto
 
-            for indicador
-            in indicadores_us
+            for indicador in indicadores_us
 
         ):
 
@@ -1426,8 +1434,7 @@ class JSearchSource:
 
             indicador in texto
 
-            for indicador
-            in indicadores_ca
+            for indicador in indicadores_ca
 
         ):
 
@@ -1457,8 +1464,7 @@ class JSearchSource:
 
             indicador in texto
 
-            for indicador
-            in indicadores_mx
+            for indicador in indicadores_mx
 
         ):
 
@@ -1488,8 +1494,7 @@ class JSearchSource:
 
             indicador in texto
 
-            for indicador
-            in indicadores_co
+            for indicador in indicadores_co
 
         ):
 
@@ -1517,347 +1522,12 @@ class JSearchSource:
 
             indicador in texto
 
-            for indicador
-            in indicadores_es
+            for indicador in indicadores_es
 
         ):
 
             return "ES"
 
-
-        # =====================================================
-        # ARGENTINA
-        # =====================================================
-
-        indicadores_ar = [
-
-            "argentina",
-
-            "buenos aires"
-
-        ]
-
-
-        if any(
-
-            indicador in texto
-
-            for indicador
-            in indicadores_ar
-
-        ):
-
-            return "AR"
-
-
-        # =====================================================
-        # CHILE
-        # =====================================================
-
-        indicadores_cl = [
-
-            "chile",
-
-            "santiago"
-
-        ]
-
-
-        if any(
-
-            indicador in texto
-
-            for indicador
-            in indicadores_cl
-
-        ):
-
-            return "CL"
-
-
-        # =====================================================
-        # BRASIL
-        # =====================================================
-
-        indicadores_br = [
-
-            "brazil",
-
-            "brasil",
-
-            "são paulo",
-
-            "sao paulo",
-
-            "rio de janeiro"
-
-        ]
-
-
-        if any(
-
-            indicador in texto
-
-            for indicador
-            in indicadores_br
-
-        ):
-
-            return "BR"
-
-
-        # =====================================================
-        # PERÚ
-        # =====================================================
-
-        indicadores_pe = [
-
-            "peru",
-
-            "perú",
-
-            "lima"
-
-        ]
-
-
-        if any(
-
-            indicador in texto
-
-            for indicador
-            in indicadores_pe
-
-        ):
-
-            return "PE"
-
-
-        # =====================================================
-        # PANAMÁ
-        # =====================================================
-
-        indicadores_pa = [
-
-            "panama",
-
-            "panamá"
-
-        ]
-
-
-        if any(
-
-            indicador in texto
-
-            for indicador
-            in indicadores_pa
-
-        ):
-
-            return "PA"
-
-
-        # =====================================================
-        # GUATEMALA
-        # =====================================================
-
-        if "guatemala" in texto:
-
-            return "GT"
-
-
-        # =====================================================
-        # HONDURAS
-        # =====================================================
-
-        if "honduras" in texto:
-
-            return "HN"
-
-
-        # =====================================================
-        # NICARAGUA
-        # =====================================================
-
-        if "nicaragua" in texto:
-
-            return "NI"
-
-
-        # =====================================================
-        # REINO UNIDO
-        # =====================================================
-
-        indicadores_gb = [
-
-            "united kingdom",
-
-            "uk",
-
-            "england",
-
-            "london"
-
-        ]
-
-
-        if any(
-
-            indicador in texto
-
-            for indicador
-            in indicadores_gb
-
-        ):
-
-            return "GB"
-
-
-        # =====================================================
-        # ALEMANIA
-        # =====================================================
-
-        indicadores_de = [
-
-            "germany",
-
-            "alemania",
-
-            "berlin"
-
-        ]
-
-
-        if any(
-
-            indicador in texto
-
-            for indicador
-            in indicadores_de
-
-        ):
-
-            return "DE"
-
-
-        # =====================================================
-        # FRANCIA
-        # =====================================================
-
-        indicadores_fr = [
-
-            "france",
-
-            "francia",
-
-            "paris"
-
-        ]
-
-
-        if any(
-
-            indicador in texto
-
-            for indicador
-            in indicadores_fr
-
-        ):
-
-            return "FR"
-
-
-        # =====================================================
-        # ITALIA
-        # =====================================================
-
-        indicadores_it = [
-
-            "italy",
-
-            "italia",
-
-            "rome",
-
-            "roma"
-
-        ]
-
-
-        if any(
-
-            indicador in texto
-
-            for indicador
-            in indicadores_it
-
-        ):
-
-            return "IT"
-
-
-        # =====================================================
-        # JAPÓN
-        # =====================================================
-
-        indicadores_jp = [
-
-            "japan",
-
-            "japón",
-
-            "japon",
-
-            "tokyo",
-
-            "tokio"
-
-        ]
-
-
-        if any(
-
-            indicador in texto
-
-            for indicador
-            in indicadores_jp
-
-        ):
-
-            return "JP"
-
-
-        # =====================================================
-        # AUSTRALIA
-        # =====================================================
-
-        indicadores_au = [
-
-            "australia",
-
-            "sydney",
-
-            "melbourne"
-
-        ]
-
-
-        if any(
-
-            indicador in texto
-
-            for indicador
-            in indicadores_au
-
-        ):
-
-            return "AU"
-
-
-        # =====================================================
-        # DESCONOCIDO
-        # =====================================================
 
         return ""
 
@@ -1881,7 +1551,9 @@ class JSearchSource:
             str(
                 pais
             )
+
             .strip()
+
             .lower()
 
         )
@@ -1919,7 +1591,6 @@ class JSearchSource:
             "cl": "CL",
 
             "brasil": "BR",
-            "brazil": "BR",
             "br": "BR",
 
             "peru": "PE",
@@ -1943,25 +1614,20 @@ class JSearchSource:
             "ni": "NI",
 
             "reino unido": "GB",
-            "united kingdom": "GB",
             "uk": "GB",
             "gb": "GB",
 
             "alemania": "DE",
-            "germany": "DE",
             "de": "DE",
 
             "francia": "FR",
-            "france": "FR",
             "fr": "FR",
 
             "italia": "IT",
-            "italy": "IT",
             "it": "IT",
 
             "japon": "JP",
             "japón": "JP",
-            "japan": "JP",
             "jp": "JP",
 
             "australia": "AU",
