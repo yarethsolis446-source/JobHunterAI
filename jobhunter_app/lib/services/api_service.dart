@@ -8,8 +8,7 @@ class ApiService {
   // URL DEL BACKEND
   // =====================================================
 
-  static const String baseUrl = 'http://10.0.2.2:8000';
-
+  static const String baseUrl = 'https://jobhunterai-tmku.onrender.com';
   // =====================================================
   // OBTENER EMPLEOS
   // =====================================================
